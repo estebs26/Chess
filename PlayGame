@@ -1,0 +1,314 @@
+public class PlayGame {
+    private static Queen whitequeen = new Queen(4.5, .5, true, true);
+    private static Queen blackqueen = new Queen(4.5, 7.5, false, true);
+
+    private static King whiteking = new King(3.5, .5, true, true);
+    private static King blackking = new King(3.5, 7.5, false, true);
+
+    private static Bishop whitebishop1 = new Bishop(2.5, .5, true, true);
+    private static Bishop whitebishop2 = new Bishop(5.5, .5, true, true);
+
+    private static Bishop blackbishop1 = new Bishop(2.5, 7.5, false, true);
+    private static Bishop blackbishop2 = new Bishop(5.5, 7.5, false, true);
+
+    private static Knight whiteknight1 = new Knight(1.5, .5, true, true);
+    private static Knight whiteknight2 = new Knight(6.5, .5, true, true);
+    private static Knight blackknight1 = new Knight(1.5, 7.5, false, true);
+    private static Knight blackknight2 = new Knight(6.5, 7.5, false, true);
+
+    private static Castle whitecastle1 = new Castle(.5, .5, true, true);
+    private static Castle whitecastle2 = new Castle(7.5, .5, true, true);
+    private static Castle blackcastle1 = new Castle(.5, 7.5, false, true);
+    private static Castle blackcastle2 = new Castle(7.5, 7.5, false, true);
+    private static Pawn[] whitepawn = new Pawn[8];
+    private static Pawn[] blackpawn = new Pawn[8];
+    private static Piece[][] board = new Piece[8][8];
+
+    public static void main(String[] args) throws InterruptedException {
+        initializeboard();
+        StdDraw.enableDoubleBuffering();
+        boolean condition = true;
+        boolean turn = true;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (board[x][y] == null) {
+                    board[x][y] = new Empty();
+                }
+            }
+        }
+        while (condition) {
+            if (turn) {
+                System.out.println("White Team's turn:");
+                int startx = 0;
+                int starty = 0;
+                int endx = 0;
+                int endy = 0;
+                int x = 0;
+                while (x < 2) {
+                    for (int i = 0; i < 1000 && !StdDraw.isMousePressed(); i++) {
+                        Thread.sleep(50);
+                    }
+                    if (x == 0) {
+                        if (StdDraw.isMousePressed()) {
+                            startx = (int) StdDraw.mouseX();
+                            starty = (int) StdDraw.mouseY();
+                            System.out.println("White Selected start: " + startx + ", " + starty);
+                        }
+                    }
+
+                    if (x == 1) {
+                        if (StdDraw.isMousePressed()) {
+                            endx = (int) StdDraw.mouseX();
+                            endy = (int) StdDraw.mouseY();
+                            System.out.println("White Selected end: " + endx + ", " + endy);
+                        }
+                    }
+                    x = x + 1;
+                    Thread.sleep(250);
+
+                }
+
+
+                boolean islegal = board[startx][starty].ismovelegal(startx, starty, board, endx, endy, turn);
+                if (islegal) {
+                    Piece piece = board[endx][endy];
+                    board[endx][endy] = board[startx][starty];
+                    board[startx][starty] = new Empty();
+                    boolean ischecked = blackking.iskingchecked(board);
+                    if (ischecked) {
+                        System.out.println(board[endx][endy]);
+                        board[endx][endy].move(endx, endy, board, startx, starty);
+                        board[startx][starty] = board[endx][endy];
+                        if (!piece.getname().equals("Empty")) {
+                            board[endx][endy] = piece;
+                            board[endx][endy].makealive();
+                            board[endx][endy].createpiece();
+                        }
+                        board[endx][endy] = new Empty();
+
+                    } else {
+                        switchpawntoqueen(turn);
+                        turn = true;
+                    }
+                }
+
+                condition = whiteking.checkalive() && blackking.checkalive();
+            }
+            if (!condition) break;
+            if (!turn) {
+                System.out.println("Black Team's turn:");
+                int startx = 0;
+                int starty = 0;
+                int endx = 0;
+                int endy = 0;
+                int x = 0;
+                while (x < 2) {
+                    for (int i = 0; i < 1000 && !StdDraw.isMousePressed(); i++) {
+                        Thread.sleep(100);
+                    }
+                    if (x == 0) {
+                        if (StdDraw.isMousePressed()) {
+                            startx = (int) StdDraw.mouseX();
+                            starty = (int) StdDraw.mouseY();
+                            System.out.println("Black Selected start: " + startx + ", " + starty);
+                        }
+                    }
+
+                    if (x == 1) {
+                        if (StdDraw.isMousePressed()) {
+                            endx = (int) StdDraw.mouseX();
+                            endy = (int) StdDraw.mouseY();
+                            System.out.println("Black Selected end: " + endx + ", " + endy);
+                        }
+                    }
+                    x = x + 1;
+                    Thread.sleep(250);
+                }
+
+
+                boolean islegal = board[startx][starty].ismovelegal(startx, starty, board, endx, endy, turn);
+                if (islegal) {
+                    Piece piece = board[endx][endy];
+                    board[endx][endy] = board[startx][starty];
+                    board[startx][starty] = new Empty();
+                    boolean ischecked = blackking.iskingchecked(board);
+                    if (ischecked) {
+                        System.out.println(board[endx][endy]);
+                        board[endx][endy].move(endx, endy, board, startx, starty);
+                        board[startx][starty] = board[endx][endy];
+                        if (!piece.getname().equals("Empty")) {
+                            board[endx][endy] = piece;
+                            board[endx][endy].makealive();
+                            board[endx][endy].createpiece();
+                        }
+                        board[endx][endy] = new Empty();
+
+                    } else {
+                        switchpawntoqueen(turn);
+                        turn = true;
+                    }
+                }
+                condition = whiteking.checkalive() && blackking.checkalive();
+
+
+            }
+        }
+        System.out.println("Game Over!");
+        if (!whiteking.checkalive()) {
+            System.out.println("Black Team Wins!");
+        }
+        if (!blackking.checkalive()) {
+            System.out.println("White Team Wins!");
+        }
+    }
+
+    private static void initializeboard() {
+        StdDraw.setCanvasSize(600, 600);
+        printCheckerboard();
+        whitequeen.createpiece();
+        blackqueen.createpiece();
+        board[4][0] = whitequeen;
+        board[4][7] = blackqueen;
+
+        whiteking.createpiece();
+        blackking.createpiece();
+        board[3][0] = whiteking;
+        board[3][7] = blackking;
+
+        whitebishop1.createpiece();
+        whitebishop2.createpiece();
+        blackbishop1.createpiece();
+        blackbishop2.createpiece();
+        board[2][0] = whitebishop1;
+        board[5][0] = whitebishop2;
+        board[2][7] = blackbishop1;
+        board[5][7] = blackbishop2;
+
+        whiteknight1.createpiece();
+        whiteknight2.createpiece();
+        blackknight1.createpiece();
+        blackknight2.createpiece();
+        board[1][0] = whiteknight1;
+        board[6][0] = whiteknight2;
+        board[1][7] = blackknight1;
+        board[6][7] = blackknight2;
+
+        whitecastle1.createpiece();
+        whitecastle2.createpiece();
+        blackcastle1.createpiece();
+        blackcastle2.createpiece();
+        board[0][0] = whitecastle1;
+        board[7][0] = whitecastle2;
+        board[0][7] = blackcastle1;
+        board[7][7] = blackcastle2;
+
+        for (int x = 0; x < 8; x++) {
+            whitepawn[x] = new Pawn(.5 + x, 1.5, true, true);
+            whitepawn[x].createpiece();
+            board[x][1] = whitepawn[x];
+        }
+        for (int x = 0; x < 8; x++) {
+            blackpawn[x] = new Pawn(.5 + x, 6.5, false, true);
+            blackpawn[x].createpiece();
+            board[x][6] = blackpawn[x];
+        }
+    }
+
+    private static void switchpawntoqueen(boolean turn) {
+        if (turn) {
+            for (int x = 0; x < 8; x++) {
+                if (whitepawn[x].gety() == 7) {
+                    java.util.Scanner scan = new java.util.Scanner(System.in);
+                    String piece = "no";
+                    while (!(piece.equals("Queen") || piece.equals("Castle") || piece.equals("Bishop") || piece.equals("Knight"))) {
+                        piece = scan.next();
+                    }
+                    if (piece.equals("Queen")) {
+                        Queen whitequeen2 = new Queen(whitepawn[x].getx() + .5, 7.5, true, true);
+                        whitepawn[x].makedead();
+                        whitepawn[x].createpiece();
+                        whitequeen2.createpiece();
+                        board[whitepawn[x].getx()][7] = whitequeen2;
+                    }
+                    if (piece.equals("Castle")) {
+                        Castle whitecastle2 = new Castle(whitepawn[x].getx() + .5, 7.5, true, true);
+                        whitepawn[x].makedead();
+                        whitepawn[x].createpiece();
+                        whitecastle2.createpiece();
+                        board[whitepawn[x].getx()][7] = whitecastle2;
+                    }
+                    if (piece.equals("Bishop")) {
+                        Bishop whitebishop2 = new Bishop(whitepawn[x].getx() + .5, 7.5, true, true);
+                        whitepawn[x].makedead();
+                        whitepawn[x].createpiece();
+                        whitebishop2.createpiece();
+                        board[whitepawn[x].getx()][7] = whitebishop2;
+                    }
+                    if (piece.equals("Knight")) {
+                        Knight whiteknight2 = new Knight(whitepawn[x].getx() + .5, 7.5, true, true);
+                        whitepawn[x].makedead();
+                        whitepawn[x].createpiece();
+                        whiteknight2.createpiece();
+                        board[whitepawn[x].getx()][7] = whiteknight2;
+                    }
+                }
+            }
+        } else {
+            for (int x = 0; x < 8; x++) {
+                if (blackpawn[x].gety() == 0) {
+                    java.util.Scanner scan = new java.util.Scanner(System.in);
+                    String piece = "no";
+                    while (!(piece.equals("Queen") || piece.equals("Castle") || piece.equals("Bishop") || piece.equals("Knight"))) {
+                        piece = scan.next();
+                    }
+                    if (piece.equals("Queen")) {
+                        Queen blackqueen2 = new Queen(whitepawn[x].getx() + .5, .5, false, true);
+                        blackpawn[x].makedead();
+                        blackpawn[x].createpiece();
+                        blackqueen2.createpiece();
+                        board[blackpawn[x].getx()][0] = blackqueen2;
+                    }
+                    if (piece.equals("Castle")) {
+                        Castle blackcastle2 = new Castle(whitepawn[x].getx() + .5, .5, false, true);
+                        blackpawn[x].makedead();
+                        blackpawn[x].createpiece();
+                        blackcastle2.createpiece();
+                        board[blackpawn[x].getx()][0] = blackcastle2;
+                    }
+                    if (piece.equals("Bishop")) {
+                        Bishop blackbishop2 = new Bishop(whitepawn[x].getx() + .5, .5, false, true);
+                        blackpawn[x].makedead();
+                        blackpawn[x].createpiece();
+                        blackbishop2.createpiece();
+                        board[blackpawn[x].getx()][0] = blackbishop2;
+                    }
+                    if (piece.equals("Knight")) {
+                        Knight blackknight2 = new Knight(whitepawn[x].getx() + .5, .5, false, true);
+                        blackpawn[x].makedead();
+                        blackpawn[x].createpiece();
+                        blackknight2.createpiece();
+                        board[blackpawn[x].getx()][0] = blackknight2;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void printCheckerboard() {
+        StdDraw.setXscale(0, 8);
+        StdDraw.setYscale(0, 8);
+
+        for (double rows = 0; rows < 8; rows++) {
+            for (double cols = 0; cols < 8; cols++) {
+                if ((rows + cols) % 2 == 0) {
+                    StdDraw.setPenColor(StdDraw.WHITE);
+                } else {
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                }
+                StdDraw.filledSquare(cols + .5, rows + .5, .5);
+            }
+        }
+        StdDraw.show();
+    }
+
+}
